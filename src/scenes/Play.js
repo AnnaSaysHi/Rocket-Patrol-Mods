@@ -43,6 +43,7 @@ class Play extends Phaser.Scene {
     });
 
     this.p1Score = 0;
+    this.timeleft = 60;
     // display score
     let scoreConfig = {
       fontFamily: 'Courier',
@@ -57,11 +58,12 @@ class Play extends Phaser.Scene {
       fixedWidth: 100
     }
     this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding*2, this.p1Score, scoreConfig);
-    
+    this.scoreRight = this.add.text(game.config.width - borderUISize - borderPadding, borderUISize + borderPadding*2, this.timeleft, scoreConfig);
     this.gameOver = false;
 
     // 60-second play clock
     scoreConfig.fixedWidth = 0;
+    this.startTime = Date.now();
     this.clock = this.time.delayedCall(60000, () => {
       this.add.text(game.config.width/2, game.config.height/2, 'GAME OVER', scoreConfig).setOrigin(0.5);
       this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Restart or ← for Menu', scoreConfig).setOrigin(0.5);
@@ -80,6 +82,14 @@ class Play extends Phaser.Scene {
     if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyR)) {
       this.scene.restart();
     }
+    this.timeleft = Math.floor((Date.now() - this.startTime)/1000);
+    if (this.timeleft < 30){
+      this.ship01.moveSpeed = game.settings.spaceshipSpeed + 2;
+      this.ship02.moveSpeed = game.settings.spaceshipSpeed + 2;
+      this.ship03.moveSpeed = game.settings.spaceshipSpeed + 2;
+    }
+    this.scoreRight.text = this.timeleft;
+
 
     // check collisions
 
@@ -128,7 +138,7 @@ class Play extends Phaser.Scene {
       boom.destroy();                       // remove explosion sprite
     });
     this.p1Score += ship.points;
-    this.scoreLeft.text = this.p1Score;   
+    this.scoreLeft.text = this.p1Score; 
     this.sound.play('sfx_explosion');   
   }
 }
