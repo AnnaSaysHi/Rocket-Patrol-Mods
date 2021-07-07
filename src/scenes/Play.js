@@ -119,6 +119,11 @@ class Play extends Phaser.Scene {
     boom.anims.play('explode');             // play explode animation
     boom.on('animationcomplete', () => {    // callback after anim completes
       ship.reset();                         // reset ship position
+      if(ship.direction == 1){
+        ship.flipX = true;
+      }else{
+        ship.flipX = false;
+      }
       ship.alpha = 1;                       // make ship visible again
       boom.destroy();                       // remove explosion sprite
     });
