@@ -7,7 +7,7 @@ class Play extends Phaser.Scene {
     this.load.image('rocket', './assets/rocket.png');
     this.load.image('spaceship', './assets/spaceship.png');
     this.load.image('starfield', './assets/starfield.png');
-    this.load.image('laser', './assets/laser.png');
+    this.load.spritesheet('laser', './assets/laser.png', {frameWidth: 4, frameHeight: 400, startFrame: 0, endFrame: 3});
     this.load.spritesheet('explosion', './assets/explosion.png', {frameWidth: 64, frameHeight: 32, startFrame: 0, endFrame: 9});
   }
   create() {
@@ -43,6 +43,11 @@ class Play extends Phaser.Scene {
       frames: this.anims.generateFrameNumbers('explosion', { start: 0, end: 9, first: 0}),
       frameRate: 30
     });
+    this.anims.create({
+      key: 'lasershot',
+      frames: this.anims.generateFrameNumbers('laser', { start: 0, end: 3, first: 0}),
+      frameRate: 15
+    });
 
     this.p1Score = 0;
     this.p1time = 60;
@@ -66,14 +71,32 @@ class Play extends Phaser.Scene {
     this.gameOver = false;
 
     // 60-second play clock
-    scoreConfig.fixedWidth = 0;
+    //scoreConfig.fixedWidth = 0;
     this.startTime = Date.now();
   }
 
   update() {
+    if(this.timeleft <= 0){
+      this.timeleft = 0;
+      let scoreConfig = {
+        fontFamily: 'Courier',
+        fontSize: '28px',
+        backgroundColor: '#F3B141',
+        color: '#843605',
+        align: 'right',
+          padding: {
+            top: 5,
+            bottom: 5,
+          },
+        fixedWidth: 0
+      }
+      this.add.text(game.config.width/2, game.config.height/2, 'GAME OVER', scoreConfig).setOrigin(0.5);
+      this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Restart or ← for Menu', scoreConfig).setOrigin(0.5);
+      this.gameOver = true;
+    }
     this.starfield.tilePositionX -= 4;
     if(!this.gameOver){
-      if(Phaser.Input.Keyboard.JustDown(keyF) && !this.p1Rocket.isFiring){
+      if(Phaser.Input.Keyboard.JustDown(keyF) && !this.p1Rocket.isFiring && this.timeleft > 5){
         this.scoreCTR.text = "FIRE!";
         this.clock = this.time.delayedCall(1000, () => {
           this.scoreCTR.text = "";
@@ -81,9 +104,24 @@ class Play extends Phaser.Scene {
         this.p1Rocket.isFiring = true;
         this.p1Rocket.sfxRocket.play();
       }
-      if(Phaser.Input.Keyboard.JustDown(keyG) && !this.p1Rocket.isFiring){
+      if(Phaser.Input.Keyboard.JustDown(keyG) && !this.p1Rocket.isFiring ){
         this.p1time -= 5;
         this.p1Rocket.sfxRocket.play();
+        let ray = this.add.sprite(this.p1Rocket.x - 2, this.p1Rocket.y - 408, 'laser').setOrigin(0, 0);
+        ray.anims.play('lasershot');             // play laser animation
+        ray.on('animationcomplete', () => {    // callback after anim completes
+          ray.destroy();
+        });
+        
+        if(this.checkLaser(this.p1Rocket, this.ship01)){
+          this.shipExplode(this.ship01);
+        }
+        if(this.checkLaser(this.p1Rocket, this.ship02)){
+          this.shipExplode(this.ship02);
+        }
+        if(this.checkLaser(this.p1Rocket, this.ship03)){
+          this.shipExplode(this.ship03);
+        }
         //laser code goes here
       }
       this.p1Rocket.update();
@@ -99,6 +137,9 @@ class Play extends Phaser.Scene {
       this.ship01.moveSpeed = game.settings.spaceshipSpeed + 2;
       this.ship02.moveSpeed = game.settings.spaceshipSpeed + 2;
       this.ship03.moveSpeed = game.settings.spaceshipSpeed + 2;
+    }
+    if(this.timeleft < 0){
+      this.timeleft = 0;
     }
     if(this.timeleft % 60 < 10){
       this.scoreRight.text = (Math.floor(this.timeleft/60) + ':0' + (this.timeleft % 60));
@@ -126,11 +167,6 @@ class Play extends Phaser.Scene {
     if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyLEFT)) {
       this.scene.start("menuScene");
     }
-    if(this.timeleft == 0){
-      this.add.text(game.config.width/2, game.config.height/2, 'GAME OVER', scoreConfig).setOrigin(0.5);
-      this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Restart or ← for Menu', scoreConfig).setOrigin(0.5);
-      this.gameOver = true;
-    }
   }
 
   checkCollision(rocket, ship) {
@@ -139,6 +175,15 @@ class Play extends Phaser.Scene {
         rocket.x + rocket.width > ship.x && 
         rocket.y < ship.y + ship.height &&
         rocket.height + rocket.y > ship. y) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  checkLaser(rocket, ship) {
+    // simple AABB checking
+    if (rocket.x < ship.x + ship.width && 
+        rocket.x + rocket.width > ship.x) {
       return true;
     } else {
       return false;
