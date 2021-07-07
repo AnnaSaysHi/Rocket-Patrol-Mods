@@ -1,3 +1,9 @@
+/*
+Rocket Patrol mods by Anna Perlow
+Completed July 6, 2021
+Modifications completed in roughly 2-3 hours
+Read the readme for points breakdown
+*/
 let config = {
     type: Phaser.AUTO,
     width: 640,
