@@ -1,4 +1,4 @@
-# Rocket-Patrol
+# Rocket-Patrol-Mods
 Scoring breakdown:
 20 points for completing tutorial
 
