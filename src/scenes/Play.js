@@ -96,7 +96,7 @@ class Play extends Phaser.Scene {
     }
     this.starfield.tilePositionX -= 4;
     if(!this.gameOver){
-      if(Phaser.Input.Keyboard.JustDown(keyF) && !this.p1Rocket.isFiring && this.timeleft > 5){
+      if(Phaser.Input.Keyboard.JustDown(keyF) && !this.p1Rocket.isFiring){
         this.scoreCTR.text = "FIRE!";
         this.clock = this.time.delayedCall(1000, () => {
           this.scoreCTR.text = "";
