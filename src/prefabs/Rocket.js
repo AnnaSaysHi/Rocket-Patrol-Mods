@@ -17,11 +17,6 @@ class Rocket extends Phaser.GameObjects.Sprite {
             this.x += this.moveSpeed;
         }
 
-        if(Phaser.Input.Keyboard.JustDown(keyF) && !this.isFiring){
-            this.sfxRocket.play();
-            this.isFiring = true;
-        }
-
         if(this.isFiring && this.y >= borderUISize * 3 + borderPadding) {
             this.y -= this.moveSpeed;
         }
