@@ -7,6 +7,7 @@ class Play extends Phaser.Scene {
     this.load.image('rocket', './assets/rocket.png');
     this.load.image('spaceship', './assets/spaceship.png');
     this.load.image('starfield', './assets/starfield.png');
+    this.load.image('laser', './assets/laser.png');
     this.load.spritesheet('explosion', './assets/explosion.png', {frameWidth: 64, frameHeight: 32, startFrame: 0, endFrame: 9});
   }
   create() {
@@ -34,6 +35,7 @@ class Play extends Phaser.Scene {
     keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
     keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
     keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+    keyG = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.G);
 
     // animation config
     this.anims.create({
@@ -78,6 +80,11 @@ class Play extends Phaser.Scene {
         }, null, this);
         this.p1Rocket.isFiring = true;
         this.p1Rocket.sfxRocket.play();
+      }
+      if(Phaser.Input.Keyboard.JustDown(keyG) && !this.p1Rocket.isFiring){
+        this.p1time -= 5;
+        this.p1Rocket.sfxRocket.play();
+        //laser code goes here
       }
       this.p1Rocket.update();
       this.ship01.update();

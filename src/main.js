@@ -6,7 +6,7 @@ let config = {
 }
 
 //reserve keyboard vars
-let keyF, keyR, keyLEFT, keyRIGHT;
+let keyF, keyR, keyLEFT, keyRIGHT, keyG;
 
 let game = new Phaser.Game(config);
 
